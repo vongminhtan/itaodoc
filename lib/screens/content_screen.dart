@@ -1002,78 +1002,66 @@ class _ContentScreenState extends State<ContentScreen> {
       );
     } else {
       final segment = viewModel.segments[viewModel.currentIndex];
-      final maxHeight = min(MediaQuery.of(context).size.height * 0.6, 500.0);
-      final contentWidth = max(150.0, MediaQuery.of(context).size.width * 0.9);
       
-      return Center(
-        child: SizedBox(
-          width: contentWidth,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: maxHeight,
-            ),
-            child: Column(
-              children: [
-                // Original content (text or image)
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: Column(
+            children: [
+              // Original content (text or image)
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      fit: StackFit.passthrough,
-                      children: [
-                        Positioned.fill(child: _buildContentBackground()),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-                          child: segment.isText
-                              ? GestureDetector(
-                                  onLongPress: () {
-                                    _copyCurrentContent(viewModel);
-                                  },
-                                  child: SingleChildScrollView(
-                                    child: Text(
-                                      segment.content.trim(),
-                                      style: TextStyle(
-                                        fontSize: _fontSize,
-                                        color: viewModel.textColor,
-                                        height: 1.5,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.3,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                )
-                              : CachedNetworkImage(
-                                  imageUrl: segment.content,
-                                  placeholder: (context, url) => 
-                                      const Center(child: CircularProgressIndicator()),
-                                  errorWidget: (context, url, error) => 
-                                      const Icon(Icons.error, size: 64),
-                                  fit: BoxFit.contain,
-                                ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-                
-                // English learning section (only for text segments with English)
-                if (segment.isText && segment.content.containsEnglish())
-                  _buildAIResultWidget(viewModel.currentIndex),
-              ],
-            ),
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  children: [
+                    Positioned.fill(child: _buildContentBackground()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                      child: segment.isText
+                          ? GestureDetector(
+                              onLongPress: () {
+                                _copyCurrentContent(viewModel);
+                              },
+                              child: Text(
+                                segment.content.trim(),
+                                style: TextStyle(
+                                  fontSize: _fontSize,
+                                  color: viewModel.textColor,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.3,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            )
+                          : CachedNetworkImage(
+                              imageUrl: segment.content,
+                              placeholder: (context, url) => 
+                                  const Center(child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) => 
+                                  const Icon(Icons.error, size: 64),
+                              fit: BoxFit.contain,
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // English learning section (only for text segments with English)
+              if (segment.isText && segment.content.containsEnglish())
+                _buildAIResultWidget(viewModel.currentIndex),
+            ],
           ),
         ),
       );
@@ -1085,33 +1073,36 @@ class _ContentScreenState extends State<ContentScreen> {
     if (_isLoadingEnglishLearning[index] == true) {
       return Container(
         width: double.infinity,
-        margin: EdgeInsets.only(top: 10, bottom: 10, left: 16, right: 16),
-        padding: EdgeInsets.all(15),
+        margin: EdgeInsets.only(top: 10, bottom: 10),
+        padding: EdgeInsets.symmetric(vertical: 15),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.9),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.grey.shade300),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                ),
               ),
-            ),
-            SizedBox(width: 8),
-            Text(
-              'Úm ba la ây ai cúc cúc',
-              style: TextStyle(
-                fontSize: _fontSize - 2,
-                color: Colors.grey,
+              SizedBox(width: 8),
+              Text(
+                'Úm ba la ây ai cúc cúc',
+                style: TextStyle(
+                  fontSize: _fontSize - 2,
+                  color: Colors.grey,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     } else if (_englishLearningResults.containsKey(index)) {
@@ -1121,8 +1112,8 @@ class _ContentScreenState extends State<ContentScreen> {
       if (result.startsWith('⚠️ Lỗi AI:')) {
         return Container(
           width: double.infinity,
-          margin: EdgeInsets.only(top: 10, bottom: 10, left: 16, right: 16),
-          padding: EdgeInsets.all(15),
+          margin: EdgeInsets.only(top: 10, bottom: 10),
+          padding: EdgeInsets.symmetric(vertical: 15),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.9),
             borderRadius: BorderRadius.circular(12),
@@ -1131,12 +1122,15 @@ class _ContentScreenState extends State<ContentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                result,
-                style: TextStyle(
-                  fontSize: _fontSize - 2,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.red.withOpacity(0.9),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  result,
+                  style: TextStyle(
+                    fontSize: _fontSize - 2,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.red.withOpacity(0.9),
+                  ),
                 ),
               ),
               SizedBox(height: 8),
@@ -1158,8 +1152,8 @@ class _ContentScreenState extends State<ContentScreen> {
       // Regular content
       return Container(
         width: double.infinity,
-        margin: EdgeInsets.only(top: 10, bottom: 10, left: 16, right: 16),
-        padding: EdgeInsets.all(15),
+        margin: EdgeInsets.only(top: 10, bottom: 10),
+        padding: EdgeInsets.symmetric(vertical: 15),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.9),
           borderRadius: BorderRadius.circular(12),
@@ -1168,32 +1162,43 @@ class _ContentScreenState extends State<ContentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Học tiếng Anh',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue.shade800,
-              ),
-            ),
-            Divider(color: Colors.blue.shade100),
-            Text(
-              result,
-              style: TextStyle(
-                fontSize: _fontSize - 2,
-                color: Colors.black87,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Học tiếng Anh',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800,
+                    ),
+                  ),
+                  Divider(color: Colors.blue.shade100),
+                  Text(
+                    result,
+                    style: TextStyle(
+                      fontSize: _fontSize - 2,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
               ),
             ),
             // TTS button
             if (_elevenLabsApiKey.isNotEmpty)
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: _isPlayingAudio ? _stopAudio : () => _readText(result),
-                  icon: Icon(_isPlayingAudio ? Icons.stop : Icons.volume_up),
-                  label: Text(_isPlayingAudio ? 'Dừng' : 'Nghe'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.blue.shade700,
+              Padding(
+                padding: EdgeInsets.only(right: 24),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: _isPlayingAudio ? _stopAudio : () => _readText(result),
+                    icon: Icon(_isPlayingAudio ? Icons.stop : Icons.volume_up),
+                    label: Text(_isPlayingAudio ? 'Dừng' : 'Nghe'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.blue.shade700,
+                    ),
                   ),
                 ),
               ),
@@ -1202,7 +1207,9 @@ class _ContentScreenState extends State<ContentScreen> {
       );
     } else if (!_autoAI) {
       return Container(
-        margin: EdgeInsets.only(top: 10, bottom: 10, left: 16, right: 16),
+        margin: EdgeInsets.only(top: 10, bottom: 10),
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 24),
         child: ElevatedButton.icon(
           onPressed: () => _requestEnglishLearning(index),
           icon: Icon(Icons.psychology),
